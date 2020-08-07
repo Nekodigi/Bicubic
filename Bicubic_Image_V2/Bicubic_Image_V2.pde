@@ -4,7 +4,7 @@ float[] xnew;
 float[] ynew;
 color[][] colnew;
 PImage img;
-Bicubic bicubic;
+BicubicImage bicubic;
 
 public void setup(){
   size(2000, 1000);
@@ -15,7 +15,7 @@ public void setup(){
   ynew = linspace(0, img.height, int(img.height*res));
   colnew = new color[xnew.length][ynew.length];
   
-  bicubic = new Bicubic(img);
+  bicubic = new BicubicImage(img);
   colnew = bicubic.solveColor(xnew, ynew);
 }
 

@@ -1,44 +1,42 @@
-class BicubicImage{
+class BicubicPos{
   float[] xx;//mesh grid
   float[] yy;//mesh grid
-  float[][] r;
-  float[][] g;
-  float[][] b;
-  BicubicImage(PImage img){
-    xx = range(img.width);
-    yy = range(img.height);
-    r = new float[xx.length][yy.length];
-    g = new float[xx.length][yy.length];
-    b = new float[xx.length][yy.length];
+  float[][] xds;//x datas
+  float[][] yds;
+  float[][] zds;
+  BicubicPos(PVector[][] poss){
+    xx = range(poss[0].length);
+    yy = range(poss.length);
+    xds = new float[xx.length][yy.length];
+    yds = new float[xx.length][yy.length];
+    zds = new float[xx.length][yy.length];
     for (int i = 0; i < xx.length; i++) {
       for (int j = 0; j < yy.length; j++) {
-        r[i][j] = red(img.get(i, j));
-        g[i][j] = green(img.get(i, j));
-        b[i][j] = blue(img.get(i, j));
+        xds[i][j] = poss[i][j].x;
+        yds[i][j] = poss[i][j].y;
+        zds[i][j] = poss[i][j].z;
       }
     }
   }
   //we have to use color at for image, to adjust point
-  color colorAt(float x, float y){//control point is moved half pixels, it's difference between pixel center and control point
-    x -= 0.5;//to adjust
-    y -= 0.5;
-    x = constrain(x, 0, img.width-1);
-    y = constrain(y, 0, img.height-1);
-    float r_ = bicubicSolver(xx, yy, r, x, y);
-    float g_ = bicubicSolver(xx, yy, g, x, y);
-    float b_ = bicubicSolver(xx, yy, b, x, y);
-    return color(r_, g_, b_);
+  PVector posAt(float x, float y){
+    x = constrain(x, 0, xx.length-1);
+    y = constrain(y, 0, yy.length-1);
+    float x_ = bicubicSolver(xx, yy, xds, x, y);
+    float y_ = bicubicSolver(xx, yy, yds, x, y);
+    float z_ = bicubicSolver(xx, yy, zds, x, y);
+    return new PVector(x_, y_, z_);
   }
   
-  color[][] solveColor(float[] xnew, float[] ynew){//xi,yi must be sorted
-    color[][] z = new color[xnew.length][ynew.length];
+  PVector[][] solvePos(float[] xnew, float[] ynew){//xi,yi must be sorted
+    PVector[][] z = new PVector[xnew.length][ynew.length];
     
     for(int n = 0; n < xnew.length; n++){
       float x = xnew[n];
       for(int m = 0; m < ynew.length; m++){
         float y = ynew[m];
         
-        z[n][m] = colorAt(x, y);
+        z[n][m] = posAt(x, y);
       }
     }
     return z;
